@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import api from './services/api';
 
 import {
@@ -13,66 +13,67 @@ import {
 
 export default function App() {
   const [repositories, setRepositories] = useState([]);
-  useEffect(() => {
-    findRepositories();
-  }, []);
 
-  function findRepositories(){
+  useEffect(() => {
     api.get('repositories').then(response => {
       setRepositories(response.data);
+    })
+  }, []);
+
+  async function handleLikeRepository(id) {
+    const response = await api.post(`repositories/${id}/like`);
+
+    const likedRepository = response.data;
+
+    const repositoriesUpdated = repositories.map(repository => {
+      if (repository.id === id) {
+        return likedRepository;
+      } else {
+        return repository;
+      }
     });
-  }
-
-  async function handleLikeRepository(id) {    
-    const repository = repositories.find(repository => repository.id === id);
-
-    if(!repository)
-      return response.status(400).send();
-
-    const response = await api.post(`repositories/${id}/like`).then(response => {
-      findRepositories();
-    }).catch(err => console.log(err));
     
-    return response.satus(204).send();
+    setRepositories(repositoriesUpdated);
+
+    console.log(repositories);
+    console.log(repositoriesUpdated);
+
   }
 
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
-
-        <View style={styles.repositoryContainer}>
-          <FlatList 
-            data={repositories}
-            keyExtractor={repository => repository.id}
-            renderItem={({ item: repository }) => (
-            <View>
+        <FlatList
+          data={repositories}
+          keyExtractor={repository => repository.id}
+          renderItem={({ item: repository }) => (
+            <View style={styles.repositoryContainer}>
               <Text style={styles.repository}>{repository.title}</Text>
 
               <View style={styles.techsContainer}>
-                <Text style={styles.tech}>ReactJS</Text>
-                <Text style={styles.tech}>Node.js</Text>
+               
               </View>
 
-              <View style={styles.techsContainer}>  
+              <View style={styles.likesContainer}>
                 <Text
-                  style={styles.likeText}             
+                  style={styles.likeText}
                   testID={`repository-likes-${repository.id}`}
-                >               
-                {repository.likes} curtid{repository.likes > 1 ? "as" : "a"}             
+                >
+                  {repository.likes} curtida{repository.likes > 1 ? 's' : ''}
                 </Text>
               </View>
+
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => handleLikeRepository(repository.id)}                
+                onPress={() => handleLikeRepository(repository.id)}
                 testID={`like-button-${repository.id}`}
               >
                 <Text style={styles.buttonText}>Curtir</Text>
               </TouchableOpacity>
-            </View>        
-            )}
-          />
-        </View>             
+            </View>
+          )}
+        />
       </SafeAreaView>
     </>
   );
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   repository: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: "bold",
   },
   techsContainer: {
