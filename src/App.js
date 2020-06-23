@@ -32,11 +32,8 @@ export default function App() {
         return repository;
       }
     });
-    
-    setRepositories(repositoriesUpdated);
 
-    console.log(repositories);
-    console.log(repositoriesUpdated);
+    setRepositories(repositoriesUpdated);
 
   }
 
@@ -52,7 +49,11 @@ export default function App() {
               <Text style={styles.repository}>{repository.title}</Text>
 
               <View style={styles.techsContainer}>
-               
+              {repository.techs.map(tech => (
+                 <Text key={tech} style={styles.tech}>
+                  {tech}
+                </Text>
+              ))}
               </View>
 
               <View style={styles.likesContainer}>
